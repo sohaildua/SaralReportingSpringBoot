@@ -2,10 +2,13 @@ package com.saral.reporting.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -17,6 +20,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -33,6 +37,7 @@ import com.saral.reporting.model.ReportSelectColumn;
 import com.saral.reporting.service.ApplInfoJsonService;
 import com.saral.reporting.service.ReportBeanService;
 import com.saral.reporting.utils.JsonUtils;
+import com.speedment.runtime.core.manager.Manager;
 
 @Transactional
 @Controller
@@ -104,12 +109,24 @@ public class ViewReportController {
 		joiner.add(initColL).add(servColL);
 		// Find data from Json tables on the basis of Service ID
 		Long servID = Long.parseLong(service_id);
-		List<ApplInfoJson> applInfoJson = applInfoJsonService.findByServiceId(servID);
+
+		/*
+		 * List<String> mapstream = Collections.emptyList();
+		 * 
+		 * try (Stream<ApplInfoJson> stream
+		 * =applInfoJsonService.findByServiceId(servID);) { mapstream =
+		 * stream.map(customer -> customer.toString()).collect(Collectors.toList());; }
+		 */
+		// Stream<ApplInfoJson> applInfoJson =
+		// applInfoJsonService.findByServiceId(servID);
+		// Stream<ApplInfoJson> applInfoJson1 =
+		// applInfoJson.parallelStream().map(element->{ return element;});
+		// applInfoJson.parallel().forEachOrdered(System.out::println);
+		System.out.println("hola" + applInfoJsonService.countByServiceId(servID));
 
 		// Fetch applInfoNode from List
-
-		applInfoJson.forEach((temp) -> {
-			// map applinfo in map
+		List<ApplInfoJson> applInfoJson = applInfoJsonService.findByServiceId(servID);
+		applInfoJson.forEach((temp) -> { // map applinfo in map
 			Map<String, Object> mapInit = JsonUtils.getMapFromString(temp.getApplInfo());
 			System.out.println("My mapObjectinit is: " + mapInit);
 
@@ -133,8 +150,14 @@ public class ViewReportController {
 		String result = SquigglyUtils.stringify(objectMapper, listofMap);
 		System.out.println(result);
 
+		for (ReportSelectColumn s : L1) {
+
+			result = result.replace(s.getReportSelectedColumnId(), s.getReportSelectedColumnName());
+		}
 		model.put("applInfoJson", result);
-		return "showReport";
+
+		//model.put("applInfoJson", result);
+		return "showReportNew";
 	}
 
 }

@@ -46,7 +46,7 @@
 		<script src="js/jquery-ui.js"></script>
 		<script src="js/jscolor.js"></script>
 		<link rel="stylesheet" href="css/jquery-ui.css" />
-		
+		<link rel="stylesheet" href="css/dataTables.jqueryui.min.css" />
 		
 		
 		<div id="navbar" class="navbar navbar-default          ace-save-state">
